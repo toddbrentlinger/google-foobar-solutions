@@ -10,9 +10,56 @@
             # Return all digits excluding this value
         # if two values (from least to greatest) have %3 == 1
             # Return all digits excluding these two values
-    # Return 0  
+    # Return 0
 
 def solution(l):
+    # Return 0 if empty list
+    if len(l) == 0:
+        return 0
+
+    # Sort list in descending order
+    l.sort(reverse=True)
+
+    # Sum all values and get remainder of 3
+    remainderSum = sum(l) % 3
+
+    if remainderSum == 0:
+        return int(''.join(map(str, l)))
+    elif remainderSum == 1:
+        # Find single instance from least to greatest whose value % 3 == 1
+        for i in range(len(l) - 1, -1, -1):
+            if l[i] % 3 == 1:
+                l.pop(i) # Pop value at index
+                return int(''.join(map(str, l))) if len(l) > 0 else 0
+        # If reach this point, could not find digit with value % 3 == 1
+        # Find two values from least to greatest whose value % 3 == 2
+        # Set remainderSum to 4 to
+        remainderSum = 4
+        for i in range(len(l) - 1, -1, -1):
+            if l[i] % 3 == 2:
+                l.pop(i) # Pop value at index
+                remainderSum -= 2
+                if remainderSum == 0:
+                    return int(''.join(map(str, l))) if len(l) > 0 else 0
+    else: # Else remainderSum == 2
+        # Find single instance from least to greatest whose value % 3 == 2
+        for i in range(len(l) - 1, -1, -1):
+            if l[i] % 3 == 2:
+                l.pop(i) # Pop value at index
+                return int(''.join(map(str, l))) if len(l) > 0 else 0
+        # If reach this point, could not find digit with value % 3 == 2
+        # Find two values from least to greatest whose value % 3 == 1
+        for i in range(len(l) - 1, -1, -1):
+            if l[i] % 3 == 1:
+                l.pop(i) # Pop value at index
+                remainderSum -= 1
+                if remainderSum == 0:
+                    return int(''.join(map(str, l))) if len(l) > 0 else 0
+    
+    # Return 0 if reach this point
+    return 0
+    
+def solution3(l):
     # Sort list in descending order
     l.sort(reverse=True)
 
@@ -28,7 +75,7 @@ def solution(l):
                 break
         # If reach this point, could not find digit with value % 3 == 1
         # Find two values from least to greatest whose value % 3 == 2
-        if remainderSum > 0:
+        if remainderSum != 0:
             # Increment remainderSum by 3
             remainderSum = 4
             for i in range(len(l) - 1, -1, -1):
@@ -46,7 +93,7 @@ def solution(l):
                 break
         # If reach this point, could not find digit with value % 3 == 2
         # Find two values from least to greatest whose value % 3 == 1
-        if remainderSum > 0:
+        if remainderSum != 0:
             for i in range(len(l) - 1, -1, -1):
                 if l[i] % 3 == 1:
                     l.pop(i) # Pop value at index
@@ -179,105 +226,107 @@ def unit_test(list, expectedOutput):
     output = solution(list)
     if output != expectedOutput:
         print(f'Test Failed!:\nList: {list}\nExpected Output: {expectedOutput}\nOutput: {output}')
-    output = solution_brute(list)
-    if output != expectedOutput:
-        print(f'Test Failed New!:\nList: {list}\nExpected Output: {expectedOutput}\nOutput: {output}')
+    # output = solution_brute(list)
+    # if output != expectedOutput:
+    #     print(f'Test Failed New!:\nList: {list}\nExpected Output: {expectedOutput}\nOutput: {output}')
 
 import time
 if __name__ == '__main__':
     start = time.perf_counter()
-    unit_test([6,3,9,1,4], 963) # 963
-    unit_test([3,1,4,1,5,9], 94311) # 94311
-    unit_test([3,1,4,1], 4311) # 4311
-    unit_test([4,4,7,3], 7443) # 7443
-    unit_test([4,7,4], 744) # 744
-    unit_test([3,6], 63) # 63
-    unit_test([2,6], 6) # 6
-    unit_test([6], 6) # 6
-    unit_test([2], 0) # 0 
-    unit_test([0], 0) # 0
-    unit_test([], 0) # 0
-    unit_test([9,9,9,9,9,9,9,9,9], 999999999)
-    # Sum: 2 - Zero 2 to remove (only 1)
-    # [1,1] -> [4,7] -> 0
-    unit_test([4,7], 0)
-    # [0,0,1,1,1,1,1] -> [9,3,1,4,4,7,7] -> [9,7,7,4,4,3,1] -> 97743
-    unit_test([9,3,1,4,4,7,7], 97743)
-    # Sum: 2 - Single 2 to remove
-    # [2,1,1,1] -> [4,5,7,1] -> [7,5,4,1] -> 741
-    unit_test([4,5,7,1], 741)
-    # Sum: 2 - Double 2 to remove
-    # [2,2,1,1,1,1] -> [5,8,1,7,1,4] -> [8,7,5,4,1,1] -> 87411
-    unit_test([5,8,1,7,1,4], 87411)
-    # Sum: 2 - 3x 2 to remove
-    # [2,2,2,1,1] -> [2,5,8,1,1] -> [8,5,2,1,1] -> 8511
-    unit_test([2,5,8,1,1], 8511)
-    # Sum: 2 - Single 1 to remove NOT POSSIBLE
-    # Sum: 2 - Double 1 to remove (same as Sum: 2 - Zero 1 to remove)
-    # Sum: 2 - Triple 1 to remove
-    # [1,1,1,1,1] -> [4,4,1,7,7] -> 774
-    unit_test([4,4,1,7,7], 774)
-    # [1,1,1,2,0] -> [4,4,1,8,6] -> 6441
-    unit_test([4,4,1,8,6], 6441)
-    # Sum: 1 - Zero 1 to remove (only 2) NOT POSSIBLE
+    count = 100000
+    for i in range(count):
+        unit_test([6,3,9,1,4], 963) # 963
+        unit_test([3,1,4,1,5,9], 94311) # 94311
+        unit_test([3,1,4,1], 4311) # 4311
+        unit_test([4,4,7,3], 7443) # 7443
+        unit_test([4,7,4], 744) # 744
+        unit_test([3,6], 63) # 63
+        unit_test([2,6], 6) # 6
+        unit_test([6], 6) # 6
+        unit_test([2], 0) # 0 
+        unit_test([0], 0) # 0
+        unit_test([], 0) # 0
+        unit_test([9,9,9,9,9,9,9,9,9], 999999999)
+        # Sum: 2 - Zero 2 to remove (only 1)
+        # [1,1] -> [4,7] -> 0
+        unit_test([4,7], 0)
+        # [0,0,1,1,1,1,1] -> [9,3,1,4,4,7,7] -> [9,7,7,4,4,3,1] -> 97743
+        unit_test([9,3,1,4,4,7,7], 97743)
+        # Sum: 2 - Single 2 to remove
+        # [2,1,1,1] -> [4,5,7,1] -> [7,5,4,1] -> 741
+        unit_test([4,5,7,1], 741)
+        # Sum: 2 - Double 2 to remove
+        # [2,2,1,1,1,1] -> [5,8,1,7,1,4] -> [8,7,5,4,1,1] -> 87411
+        unit_test([5,8,1,7,1,4], 87411)
+        # Sum: 2 - 3x 2 to remove
+        # [2,2,2,1,1] -> [2,5,8,1,1] -> [8,5,2,1,1] -> 8511
+        unit_test([2,5,8,1,1], 8511)
+        # Sum: 2 - Single 1 to remove NOT POSSIBLE
+        # Sum: 2 - Double 1 to remove (same as Sum: 2 - Zero 1 to remove)
+        # Sum: 2 - Triple 1 to remove
+        # [1,1,1,1,1] -> [4,4,1,7,7] -> 774
+        unit_test([4,4,1,7,7], 774)
+        # [1,1,1,2,0] -> [4,4,1,8,6] -> 6441
+        unit_test([4,4,1,8,6], 6441)
+        # Sum: 1 - Zero 1 to remove (only 2) NOT POSSIBLE
 
-    # [2,2,2,2,1,1,1,0,0] %3=2 -> [8,5,5,2,1,4,4,3,6] -> [8,6,5,5,4,4,3,2,1] -> 86554431
-    unit_test([8,5,5,2,1,4,4,3,6], 86554431)
+        # [2,2,2,2,1,1,1,0,0] %3=2 -> [8,5,5,2,1,4,4,3,6] -> [8,6,5,5,4,4,3,2,1] -> 86554431
+        unit_test([8,5,5,2,1,4,4,3,6], 86554431)
 
-    ####################################################
+        ####################################################
 
-    # If remainderSum == 0
-        # Return all digits
-    # Else If remainderSum == 1
-        # If single value (from least to greatest) has %3 == 1
-            # Return all digits excluding this value
-        # If two values (from least to greatest) have %3 == 2
-            # Return all digits excluding these two values
-    # Else remainderSum == 2
-        # If single value (from least to greatest) has %3 == 2
-            # Return all digits excluding this value
-        # if two values (from least to greatest) have %3 == 1
-            # Return all digits excluding these two values
-    # Return 0
+        # If remainderSum == 0
+            # Return all digits
+        # Else If remainderSum == 1
+            # If single value (from least to greatest) has %3 == 1
+                # Return all digits excluding this value
+            # If two values (from least to greatest) have %3 == 2
+                # Return all digits excluding these two values
+        # Else remainderSum == 2
+            # If single value (from least to greatest) has %3 == 2
+                # Return all digits excluding this value
+            # if two values (from least to greatest) have %3 == 1
+                # Return all digits excluding these two values
+        # Return 0
 
-    # [2,2,0] -> [2,5,3] %3 = 1 -> [5,3,2]
-    # Try removing single '1'. If sum remainder still not zero, try removing '2'.
-    # Can only remove either 1x-'1' or 2x-'2' to get remainder sum to 0. 
-    # Ex. Sum of [2,5,3] is 10 and remainder of 3 (10%3) is 1.
-    # Test for sum at 10 minus values whose remainder is 1 = 10 - (1,4,) = 9 (divisible by 3)
-    # Test for sum at 10-4 = 6 (divisible by 3)
-    # Do not need to test for sum at 10-7=3 (divisible by 3) since 
-    unit_test([2,5,3], 3)
+        # [2,2,0] -> [2,5,3] %3 = 1 -> [5,3,2]
+        # Try removing single '1'. If sum remainder still not zero, try removing '2'.
+        # Can only remove either 1x-'1' or 2x-'2' to get remainder sum to 0. 
+        # Ex. Sum of [2,5,3] is 10 and remainder of 3 (10%3) is 1.
+        # Test for sum at 10 minus values whose remainder is 1 = 10 - (1,4,) = 9 (divisible by 3)
+        # Test for sum at 10-4 = 6 (divisible by 3)
+        # Do not need to test for sum at 10-7=3 (divisible by 3) since 
+        unit_test([2,5,3], 3)
 
-    # [1,1,0] -> [4,7,6] %3 = 2 -> [7,6,4] -> 6
-    # Try removing first '2'. If sum remainder still not zero, try removing '1'
-    unit_test([4,7,6], 6)
+        # [1,1,0] -> [4,7,6] %3 = 2 -> [7,6,4] -> 6
+        # Try removing first '2'. If sum remainder still not zero, try removing '1'
+        unit_test([4,7,6], 6)
 
-    # [1,0] -> [4,3] -> 3
-    unit_test([4,3], 3)
-    # [1,1,0] -> [7,4,3] -> 3
-    unit_test([7,4,3], 3)
-    # [1,1,1,0] -> [7,4,4,3] -> 7443
-    unit_test([7,4,4,3], 7443)
-    # [2,0] -> [8,3] -> 3
-    unit_test([8,3], 3)
-    # [2,2,0] -> [8,5,3] -> 3
-    unit_test([8,5,3], 3)
-    # [2,2,2,0] -> [8,5,5,3] -> 8553
-    unit_test([8,5,5,3], 8553)
-    # [2,2,2,2,0] -> [8,8,5,5,3] -> 8853
-    unit_test([8,8,5,5,3], 8853)
+        # [1,0] -> [4,3] -> 3
+        unit_test([4,3], 3)
+        # [1,1,0] -> [7,4,3] -> 3
+        unit_test([7,4,3], 3)
+        # [1,1,1,0] -> [7,4,4,3] -> 7443
+        unit_test([7,4,4,3], 7443)
+        # [2,0] -> [8,3] -> 3
+        unit_test([8,3], 3)
+        # [2,2,0] -> [8,5,3] -> 3
+        unit_test([8,5,3], 3)
+        # [2,2,2,0] -> [8,5,5,3] -> 8553
+        unit_test([8,5,5,3], 8553)
+        # [2,2,2,2,0] -> [8,8,5,5,3] -> 8853
+        unit_test([8,8,5,5,3], 8853)
 
-    # [2,1] -> [5,7] -> 75
-    unit_test([5,7], 75)
-    # [2,1,0] -> [5,7,6] -> 765
-    unit_test([5,7,6], 765)
+        # [2,1] -> [5,7] -> 75
+        unit_test([5,7], 75)
+        # [2,1,0] -> [5,7,6] -> 765
+        unit_test([5,7,6], 765)
 
-    # [2,2,1,0] -> [2,5,4,6] -> [6,5,4,2] -> 654
-    unit_test([2,5,4,6], 654)
+        # [2,2,1,0] -> [2,5,4,6] -> [6,5,4,2] -> 654
+        unit_test([2,5,4,6], 654)
 
     end = time.perf_counter()
-    print(f'Unit Tests Finished with time elapsed: {end-start}')
+    print(f'Unit Tests Finished with average time elapsed: {(end-start) / count}')
 
 """
  0 0's first digit: 0, 3,6,9
